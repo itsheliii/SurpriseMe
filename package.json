@@ -1,0 +1,16 @@
+{
+    "name": "surpriseme",
+    "private": true,
+    "version": "0.1.0",
+    "description": "SurpriseMe - create personalized digital surprises",
+    "workspaces": ["shared", "backend"],
+    "scripts": {
+      "build": "npm run build --workspace shared && npm run build --workspace backend",
+      "typecheck": "npm run build",
+      "test": "npm run test --workspaces --if-present",
+      "lint": "echo \"add eslint later\""
+    },
+    "devDependencies": {
+      "typescript": "^5.6.0"
+    }
+  }
