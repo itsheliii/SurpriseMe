@@ -1,1 +1,10 @@
-# files git must never save
+node_modules/
+dist/
+cdk.out/
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
+.vscode/
+coverage/
