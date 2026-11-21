@@ -1,7 +1,7 @@
 // The ONLY place that reads/writes surprise items in DynamoDB.
 // Knows nothing about HTTP, emails, or login.
 import {GetCommand, PutCommand, QueryCommand, UpdateCommand} from "@aws-sdk/lib-dynamodb";
-import type { Surprise } from "@surpriseme/shared";
+import type { Surprise, SurpriseStatus, UpdateSurpriseInput} from "@surpriseme/shared";
 import { db, getTableName } from "./client";
 
 
@@ -92,3 +92,54 @@ export async function getSurpriseByTokenHash(tokenHash: string): Promise<Surpris
   const item = result.Items?.[0];
   return item ? toSurprise(item) : null;
 }
+
+
+// Changes only the fields you pass in. REturns the updated surprise
+// the firld names comes from a zod-checked object, so nobody can write arbitrary coloums
+
+// Changes only the fields you pass in. Returns the updated surprise.
+// The field names come from a zod-checked object, so nobody can write arbitrary columns.
+export async function updateSurpriseFields(
+  id: string,
+  changes: UpdateSurpriseInput
+): Promise<Surprise> {
+  const names: Record<string, string> = { "#updatedAt": "updatedAt" };
+  const values: Record<string, unknown> = { ":now": new Date().toISOString() };
+  const sets: string[] = ["#updatedAt = :now"];
+
+  Object.entries(changes).forEach(([field, value], i) => {
+    if (value === undefined) return;
+    names[`#f${i}`] = field;
+    values[`:v${i}`] = value;
+    sets.push(`#f${i} = :v${i}`);
+  });
+
+  const result = await db.send(
+    new UpdateCommand({
+      TableName: getTableName(),
+      Key: { PK: `SURPRISE#${id}`, SK: "META" },
+      UpdateExpression: `SET ${sets.join(", ")}`, 
+      ConditionExpression: "attribute_exists(PK)",
+      ExpressionAttributeNames: names,
+      ExpressionAttributeValues: values,
+      ReturnValues: "ALL_NEW",
+    })
+  );
+  return toSurprise(result.Attributes ?? {});
+}
+
+// Changes only the status (draft, scheduled, delivered, cancelled).
+export async function setSurpriseStatus(id: string, status: SurpriseStatus): Promise<void> {
+  await db.send(
+    new UpdateCommand({
+      TableName: getTableName(),
+      Key: { PK: `SURPRISE#${id}`, SK: "META" },
+      UpdateExpression: "SET #status = :status, updatedAt = :now",
+      ConditionExpression: "attribute_exists(PK)",
+      ExpressionAttributeNames: { "#status": "status" },
+      ExpressionAttributeValues: { ":status": status, ":now": new Date().toISOString() },
+    })
+  );
+}
+
+

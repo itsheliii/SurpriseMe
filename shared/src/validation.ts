@@ -22,6 +22,9 @@ export const createSurpriseSchema = z.object({
   deliverAt: z.string().datetime(),
 });
 
+// Editing: same rules as creating, but every field is optional.
+export const updateSurpriseSchema = createSurpriseSchema.partial();
+
 export const addMessageSchema = z.object({
   authorName: z.string().trim().min(1).max(60),
   text: z.string().trim().min(1).max(LIMITS.messageMaxLength),
@@ -44,3 +47,4 @@ export type CreateSurpriseInput = z.infer<typeof createSurpriseSchema>;
 export type AddMessageInput = z.infer<typeof addMessageSchema>;
 export type UploadUrlRequest = z.infer<typeof uploadUrlRequestSchema>;
 export type AddGiftCardInput = z.infer<typeof addGiftCardSchema>;
+export type UpdateSurpriseInput = z.infer<typeof updateSurpriseSchema>;
