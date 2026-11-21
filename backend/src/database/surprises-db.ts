@@ -68,7 +68,7 @@ export async function setShareTokenHash(id: string, tokenHash: string): Promise<
       UpdateExpression: "SET shareTokenHash = :hash, GSI2PK = :gsi2pk, GSI2SK = :gsi2sk, updatedAt = :now",
       ConditionExpression: "attribute_exists(PK)", // must already exist
       ExpressionAttributeValues: {
-        ":tokenHash": tokenHash,
+        ":hash": tokenHash,
         ":gsi2pk": `SHARE#${tokenHash}`, // lets us find the surprsie of a token
         ":gsi2sk": `SURPRISE#${id}`,
         ":now": new Date().toISOString(),
@@ -85,7 +85,7 @@ export async function getSurpriseByTokenHash(tokenHash: string): Promise<Surpris
       TableName: getTableName(),
       IndexName: "GSI2",
       KeyConditionExpression: "GSI2PK = :token",
-      ExpressionAttributeValues: { ":token": `TOKEN#${tokenHash}` },
+      ExpressionAttributeValues: { ":token": `SHARE#${tokenHash}` },
       Limit: 1,
     })
   );

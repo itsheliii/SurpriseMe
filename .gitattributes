@@ -1,0 +1,3 @@
+# Keep Linux-style line endings (LF) for all text files,
+# no matter which tool or operating system edits them.
+* text=auto eol=lf
