@@ -9,7 +9,7 @@ npm run dev
 ```
 
 Open http://localhost:5173. Vite reloads the page when you edit `frontend/src/`.
-The starter page uses shared event types and does not require AWS or a backend.
+The starter page uses shared event types and does not require a backend.
 Authentication and API integration are not connected yet.
 
 ```sh
@@ -20,7 +20,7 @@ npm run preview --workspace frontend
 ```
 
 The frontend production output is `frontend/dist/`. The preview command serves
-that build locally; it does not deploy to AWS.
+that build locally
 
 ## Project structure
 
