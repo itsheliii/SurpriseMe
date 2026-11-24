@@ -5,11 +5,13 @@
     "description": "SurpriseMe - create personalized digital surprises",
     "workspaces": [
         "shared",
-        "backend"
+        "backend",
+        "frontend"
     ],
     "scripts": {
-        "build": "npm run build --workspace shared && npm run build --workspace backend",
-        "typecheck": "npm run build",
+        "dev": "npm run dev --workspace frontend",
+        "build": "npm run build --workspace shared && npm run build --workspace backend && npm run build --workspace frontend",
+        "typecheck": "npm run build --workspace shared && npm run build --workspace backend && npm run typecheck --workspace frontend",
         "test": "npm run test --workspaces --if-present",
         "lint": "echo \"add eslint later\""
     },

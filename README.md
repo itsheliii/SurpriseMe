@@ -1,3 +1,27 @@
+## Local development
+
+Use Node.js 22.12+ (22.x), 24.x, or 26+ to match the test tooling's supported versions.
+From the project root:
+
+```sh
+npm ci
+npm run dev
+```
+
+Open http://localhost:5173. Vite reloads the page when you edit `frontend/src/`.
+The starter page uses shared event types and does not require AWS or a backend.
+Authentication and API integration are not connected yet.
+
+```sh
+npm run typecheck
+npm test
+npm run build
+npm run preview --workspace frontend
+```
+
+The frontend production output is `frontend/dist/`. The preview command serves
+that build locally; it does not deploy to AWS.
+
 ## Project structure
 
 Each top-level folder has ONE job. Code you write goes inside each folder's `src/`
