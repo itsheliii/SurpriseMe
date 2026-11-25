@@ -5,8 +5,11 @@ import { getSurpriseByTokenHash } from "../../database/surprises-db";
 import { bodyOf, makeSurprise, publicRequest } from "../../test-utils/events";
 import { generateToken, hashToken } from "../../utils/tokens";
 import { handler } from "./open-surprise";
+import {listMessages} from "../../database/messages-db";
+
 
 vi.mock("../../database/surprises-db");
+vi.mock("../../database/messages-db");
 vi.mock("../../utils/logger");
 
 const token = generateToken();
@@ -14,6 +17,7 @@ const surprise = makeSurprise({ deliverAt: "2030-12-01T09:00:00Z" });
 
 beforeEach(() => {
   vi.resetAllMocks();
+  vi.mocked(listMessages).mockResolvedValue([]);
   vi.useFakeTimers();
 });
 
