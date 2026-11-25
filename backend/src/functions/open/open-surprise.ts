@@ -12,7 +12,7 @@ import {json, notFound, toResponse} from "../../utils/errors";
 import {logger} from "../../utils/logger";
 import { hashToken } from "../../utils/tokens";
 import { isDelivered } from "../../utils/time-gate";
-
+import { listMessages } from "../../database/messages-db"; 
 // Our tokens are 32 random bytes, base64url-encoded = exeactly 43 characters
 
 const tokenSchema = z.string().regex(/^[A-Za-z0-9_-]{43}$/);
@@ -45,14 +45,22 @@ export async function handler(
         }
 
         // 4. Delievered: return the full surprise
-        // TODO: messages, photo links and gift cards get added once those features are implemented
+        // TODO: photo links and gift cards get added once those features are implemented
+        const messages = await listMessages(surprise.id);
         const opened: OpenSurpriseResponse = {
             state: "open",
             title: surprise.title,
             eventType: surprise.eventType,
             revealStyle: surprise.revealStyle,
             recipientName: surprise.recipientName,
-            messages: [],
+            messages: messages.map((m) => ({
+                id: m.id,
+                authorName: m.authorName,
+                // A message with a future unlock time stays empty until then (server decides).
+                text: m.unlockAt && !isDelivered(m.unlockAt) ? "" : m.text,
+                hidden: m.hidden,
+                unlockAt: m.unlockAt,
+            })),
             photoUrls: [],
             giftCards: [],
         };
