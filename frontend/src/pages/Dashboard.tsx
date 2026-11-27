@@ -54,7 +54,7 @@ export default function Dashboard() {
               <tbody>
                 {surprises.map((surprise) => (
                   <tr key={surprise.id}>
-                    <th scope="row"><a className="draft-link" href={`/surprises/new?draft=${encodeURIComponent(surprise.id)}`}>{surprise.title}</a><span className="event-type">{surprise.eventType.replaceAll("-", " ")}</span></th>
+                    <th scope="row"><a className="draft-link" href={`/surprises/${encodeURIComponent(surprise.id)}`}>{surprise.title}</a><span className="event-type">{surprise.eventType.replaceAll("-", " ")}</span></th>
                     <td>{surprise.recipientName}</td>
                     <td>{new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(surprise.deliverAt))}</td>
                     <td><span className={`status-badge status-${surprise.status}`}>{surprise.status}</span></td>

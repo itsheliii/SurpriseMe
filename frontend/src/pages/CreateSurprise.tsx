@@ -73,8 +73,9 @@ export default function CreateSurprise() {
     if (message.length > LIMITS.messageMaxLength) { setError("Your message is too long."); return; }
     setBusy(true);
     try {
-      await saveLocalDraft({ ...parsed.data, id: draftId ?? crypto.randomUUID(), status: "draft", message: message.trim(), photos, updatedAt: new Date().toISOString() });
-      window.location.assign("/dashboard");
+      const id = draftId ?? crypto.randomUUID();
+      await saveLocalDraft({ ...parsed.data, id, status: "draft", message: message.trim(), photos, updatedAt: new Date().toISOString() });
+      window.location.assign(`/surprises/${encodeURIComponent(id)}`);
     } catch {
       setError("Your draft couldn't be saved. Your browser storage may be full or unavailable. Keep this page open and try again.");
       setBusy(false);
