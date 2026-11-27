@@ -1,11 +1,18 @@
-import { useState } from "react";
-import type { Surprise } from "@surpriseme/shared";
+import { useEffect, useState } from "react";
+import { listLocalDrafts, type LocalDraft } from "../api/local-drafts";
 import "../styles/dashboard.css";
 
-// Replace with GET /surprises when the API is connected.
-const allSurprises: Surprise[] = [];
-
 export default function Dashboard() {
+  const [allSurprises, setAllSurprises] = useState<LocalDraft[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  useEffect(() => {
+    let active = true;
+    listLocalDrafts().then((drafts) => { if (active) setAllSurprises(drafts); })
+      .catch(() => { if (active) setError("Local drafts couldn't be loaded. Browser storage may be unavailable."); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
   const [filter, setFilter] = useState("all");
   const surprises = allSurprises.filter((surprise) => filter === "all" || surprise.status === filter);
 
@@ -23,11 +30,10 @@ export default function Dashboard() {
             <h1>Your surprises</h1>
             <p className="dashboard-description">View and manage your surprises.</p>
           </div>
-          <div className="create-placeholder">
-            <button type="button" className="create-button" disabled aria-describedby="create-note">+ New surprise</button>
-            <span id="create-note">Creation page coming soon</span>
-          </div>
+          <a className="create-button" href="/surprises/new">+ New surprise</a>
         </div>
+        <p className="local-draft-note">Local drafts only. Account storage and delivery aren't connected yet.</p>
+        {error && <p className="form-error" role="alert">{error}</p>}
         <section className="surprises-panel" aria-label="Surprises">
           <div className="list-toolbar">
             <h2>All surprises <span className="list-count">{allSurprises.length}</span></h2>
@@ -48,16 +54,17 @@ export default function Dashboard() {
               <tbody>
                 {surprises.map((surprise) => (
                   <tr key={surprise.id}>
-                    <th scope="row">{surprise.title}<span className="event-type">{surprise.eventType.replaceAll("-", " ")}</span></th>
+                    <th scope="row"><a className="draft-link" href={`/surprises/new?draft=${encodeURIComponent(surprise.id)}`}>{surprise.title}</a><span className="event-type">{surprise.eventType.replaceAll("-", " ")}</span></th>
                     <td>{surprise.recipientName}</td>
-                    <td>{new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeZone: "UTC" }).format(new Date(surprise.deliverAt))}</td>
+                    <td>{new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(new Date(surprise.deliverAt))}</td>
                     <td><span className={`status-badge status-${surprise.status}`}>{surprise.status}</span></td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          {surprises.length === 0 && <p className="empty-list" role="status">{filter === "all" ? "No surprises yet." : "No surprises with this status."}</p>}
+          {!loading && !error && surprises.length === 0 && <p className="empty-list" role="status">{filter === "all" ? "No surprises yet." : "No surprises with this status."}</p>}
+          {loading && <p className="empty-list" role="status">Loading drafts…</p>}
         </section>
       </main>
     </div>

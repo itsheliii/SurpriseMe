@@ -1,9 +1,11 @@
 import SignIn from "./pages/SignIn";
+import CreateSurprise from "./pages/CreateSurprise";
 import Dashboard from "./pages/Dashboard";
 
 export default function App() {
   // Separate screens for local development; Cognito keeps its existing callback.
   const path = window.location.pathname.replace(/\/$/, "") || "/";
+  if (path === "/surprises/new") return <CreateSurprise />;
   if (path === "/dashboard") return <Dashboard />;
   if (path === "/" || path === "/auth/callback") return <SignIn />;
   return (
